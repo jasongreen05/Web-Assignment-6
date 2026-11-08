@@ -1,0 +1,97 @@
+{
+  "info": {
+    "name": "Notes API",
+    "description": "Run top to bottom. 'Create a note' saves the new id, so the next requests use it automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api/notes" },
+    { "key": "noteId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Create a note",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('201 Created', () => pm.response.to.have.status(201));",
+        "pm.collectionVariables.set('noteId', pm.response.json()._id);"
+      ] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Exam topics\",\n  \"body\": \"Hooks, Express, REST\",\n  \"tags\": [\"exam\", \"week9\"]\n}" },
+        "url": "{{baseUrl}}"
+      }
+    },
+    {
+      "name": "List all notes",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('200 OK', () => pm.response.to.have.status(200));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}" }
+    },
+    {
+      "name": "Get one note",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('200 OK', () => pm.response.to.have.status(200));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/{{noteId}}" }
+    },
+    {
+      "name": "Update a note",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('200 OK', () => pm.response.to.have.status(200));"
+      ] } }],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"title\": \"Final exam topics\",\n  \"tags\": [\"exam\"]\n}" },
+        "url": "{{baseUrl}}/{{noteId}}"
+      }
+    },
+    {
+      "name": "Delete a note",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+      ] } }],
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/{{noteId}}" }
+    },
+    {
+      "name": "Error - get the deleted note (404)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/{{noteId}}" }
+    },
+    {
+      "name": "Error - create without a title (400)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('400 Bad Request', () => pm.response.to.have.status(400));"
+      ] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"body\": \"no title here\"\n}" },
+        "url": "{{baseUrl}}"
+      }
+    },
+    {
+      "name": "Error - invalid id (400)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('400 Bad Request', () => pm.response.to.have.status(400));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/abc" }
+    },
+    {
+      "name": "Error - malformed JSON (400)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('400 Bad Request', () => pm.response.to.have.status(400));"
+      ] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"title\": \"oops\", }" },
+        "url": "{{baseUrl}}"
+      }
+    }
+  ]
+}
